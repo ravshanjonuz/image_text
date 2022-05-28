@@ -3,7 +3,9 @@ from PIL import Image
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from loader import dp
+from loader import dp, bot
+from utils.misc import subscription
+from data.config import CHANNELS, text_notaccepted, text_accepted, btn_accept
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 tessdata_dir_config = r'--tessdata-dir "C:\Program Files\Tesseract-OCR\tessdata"'
@@ -22,8 +24,8 @@ btns = {
     "hin": "🇮🇳 Indian",
     "chi_tra": "🇨🇳 Chinese Traditional",
     "chi_sim": "🇨🇳 Chinese – Simplified",
-    "ara": "🇸🇦 Arabic"
-    # "Arabic": "🇦🇪 Arabic large"
+    "ara": "🇸🇦 Arabic",
+    "tur": "🇹🇷 Turkish"
 }
 
 
@@ -32,11 +34,32 @@ async def callback_query(call: types.CallbackQuery):
     cid = call.message.chat.id
     try:
         await call.answer()
-        if call.data in list(btns.keys()):
+        if call.data == "check_subs":
+            final_status = True
+            chs = []
+            for channel in CHANNELS:
+                status = await subscription.check(
+                    user_id=cid,
+                    channel=channel
+                )
+                final_status *= status
+                channel = await bot.get_chat(channel)
+                if not status:
+                    invite_link = await channel.export_invite_link()
+                    chs.append([types.InlineKeyboardButton(channel.title, url=invite_link)])
+            chs.append([types.InlineKeyboardButton(text=btn_accept, callback_data="check_subs")])
+
+            if not final_status:
+                await call.message.answer(text_notaccepted,
+                                          reply_markup=InlineKeyboardMarkup(inline_keyboard=chs),
+                                          disable_web_page_preview=True)
+            else:
+                await call.message.answer(text_accepted, disable_web_page_preview=True)
+            await bot.delete_message(cid, call.message.message_id)
+        elif call.data in list(btns.keys()):
             text = pytesseract.image_to_string(Image.open(f"data/images/{cid}.png"), lang=call.data,
                                                config=tessdata_dir_config)
 
-            # text = pytesseract.image_to_string(image)
             await call.message.reply(text) if text else await call.message.reply("Textni ololmadim!")
 
     except Exception as e:
@@ -57,8 +80,8 @@ def getBtns():
             [InlineKeyboardButton(btns["hin"], callback_data="hin"),
              InlineKeyboardButton(btns["chi_tra"], callback_data="chi_tra")],
             [InlineKeyboardButton(btns["chi_sim"], callback_data="chi_sim"),
-             InlineKeyboardButton(btns["ara"], callback_data="ara")]
-            # [InlineKeyboardButton(btns["Arabic"], callback_data="Arabic")],
+             InlineKeyboardButton(btns["ara"], callback_data="ara")],
+            [InlineKeyboardButton(btns["tur"], callback_data="tur")],
         ]
     )
 
