@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-aiogram = "~=2.14"
-environs = "~=8.0.0"
+aiogram = "*"
+environs = "*"
 opencv-python = "*"
 pytesseract = "*"
 wand = "*"
@@ -13,4 +13,4 @@ wand = "*"
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "*"

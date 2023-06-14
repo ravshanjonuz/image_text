@@ -3,15 +3,15 @@ from PIL import Image
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from handlers.users.admin import create_user
 from loader import dp, bot
 from utils.misc import subscription
 from data.config import CHANNELS, text_notaccepted, text_accepted, btn_accept
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-tessdata_dir_config = r'--tessdata-dir "C:\Program Files\Tesseract-OCR\tessdata"'
+tessdata_dir_config = r'--tessdata-dir "/usr/share/tesseract-ocr/4.00/tessdata/"'
 
 texts = {}
-
+print("a")
 btns = {
     "eng": "🇺🇸 English",
     "rus": "🇷🇺 Russian",
@@ -60,7 +60,7 @@ async def callback_query(call: types.CallbackQuery):
             text = pytesseract.image_to_string(Image.open(f"data/images/{cid}.png"), lang=call.data,
                                                config=tessdata_dir_config)
 
-            await call.message.reply(text) if text else await call.message.reply("Textni ololmadim!")
+            await call.message.reply(f"```{text}```", parse_mode="Markdown") if text else await call.message.reply("Textni ololmadim!")
 
     except Exception as e:
         print("Query: ", e)
@@ -89,5 +89,18 @@ def getBtns():
 @dp.message_handler(content_types=types.ContentTypes.PHOTO)
 async def bot_echo(message: types.Message):
     path = f"data/images/{message.chat.id}.png"
-    await message.photo[-1].download(path)
+    await message.photo[-1].download(destination_file=path)
     await message.copy_to(message.chat.id, reply_markup=getBtns())
+
+
+@dp.message_handler(state=None)
+async def bot_echo(message: types.Message):
+    cid = message.chat.id
+    try:
+        create_user(cid, message.from_user.full_name)
+    except:
+        print('echo', 1)
+    await message.answer(f"Assalomu Alaykum <b>{message.from_user.full_name}</b>. \n"
+                         f"Menga shunchaki <b>🖼 rasm</b> yuboring men esa ichidagi matnlarni olib beraman",
+                         parse_mode="HTML")
+

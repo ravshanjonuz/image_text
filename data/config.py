@@ -4,10 +4,10 @@ from environs import Env
 env = Env()
 env.read_env()
 
-CHANNELS = ['-1001571981540']
+CHANNELS = ['-1001571981540', ]  # '-', ]
 
 # .env fayl ichidan quyidagilarni o'qiymiz
-BOT_TOKEN = env.str("BOT_TOKEN")  # Bot toekn
+BOT_TOKEN = "5439172106:AAGX1Ycnf19ytJ126cJKLqe0r64aPSz7Kbg"  # Bot toekn
 ADMINS = env.list("ADMINS")  # adminlar ro'yxati
 IP = env.str("ip")  # Xosting ip manzili
 btn_accept = "✅ A'zo bo'ldim"
