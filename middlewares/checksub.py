@@ -11,7 +11,7 @@ class BigBrother(BaseMiddleware):
     async def on_pre_process_update(self, update: types.Update, data: dict):
         if update.message:
             user = update.message.from_user.id
-            print(update.message)
+            # print(update.message)
         elif update.callback_query:
             user = update.callback_query.from_user.id
             if update.callback_query.data == "check_subs":
