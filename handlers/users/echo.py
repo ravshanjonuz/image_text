@@ -1,6 +1,7 @@
 import pytesseract
 from PIL import Image
 from aiogram import types
+from aiogram.enums import ChatAction
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from handlers.users.admin import create_user
@@ -59,7 +60,7 @@ async def callback_query(call: types.CallbackQuery):
         elif call.data in list(btns.keys()):
             text = pytesseract.image_to_string(Image.open(f"data/images/{cid}.png"), lang=call.data,
                                                config=tessdata_dir_config)
-
+            await bot.send_chat_action(call.from_user.id, ChatAction.TYPING)
             await call.message.reply(f"{text}") if text else await call.message.reply("Textni ololmadim!")
 
     except Exception as e:
