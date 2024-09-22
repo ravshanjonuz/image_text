@@ -60,7 +60,7 @@ async def callback_query(call: types.CallbackQuery):
             text = pytesseract.image_to_string(Image.open(f"data/images/{cid}.png"), lang=call.data,
                                                config=tessdata_dir_config)
 
-            await call.message.reply(f"```{text}```", parse_mode="Markdown") if text else await call.message.reply("Textni ololmadim!")
+            await call.message.reply(f"{text}", parse_mode="Markdown") if text else await call.message.reply("Textni ololmadim!")
 
     except Exception as e:
         print("Query: ", e)
